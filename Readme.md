@@ -3,7 +3,7 @@
 This is my own implementation of a [Sierpinski triangle](https://en.wikipedia.org/wiki/Sierpinski_triangle) explorer using `typescript`, `karma`, `jasmine`, `tslint` and `webpack`.
 
 ## Interactive demo
-*Will upload it somewhere soon*. 
+[https://bogthe.github.io/triangles-ts/](https://bogthe.github.io/triangles-ts/) 
 
 ## Set up
 - clone this repository !
