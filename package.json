@@ -1,0 +1,32 @@
+{
+  "name": "triangles-ts",
+  "version": "1.0.0",
+  "description": "Sierpinski Triangle",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run webpack\" \"npm run lite\"",
+    "lite": "lite-server",
+    "webpack": "webpack --watch",
+    "lint": "tslint ./src/**/**.ts",
+    "test": "karma start karma.conf.js"
+  },
+  "keywords": [],
+  "author": "Bogdan Stolojan",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^3.5.0",
+    "jasmine-core": "^2.7.0",
+    "karma": "^1.7.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-typescript": "^3.0.4",
+    "lite-server": "^2.3.0",
+    "ts-loader": "^2.3.2",
+    "tslint": "^5.5.0",
+    "tslint-consistent-codestyle": "^1.6.0",
+    "typescript": "^2.4.2"
+  },
+  "dependencies": {
+    "@types/jasmine": "^2.5.53"
+  }
+}
