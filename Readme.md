@@ -1,6 +1,6 @@
 # Triangles - Typescript
 
-*Build status:*
+*Build status:* ![build status](https://api.travis-ci.org/bogthe/triangles-ts.svg?branch=master)
 
 ## What?!
 This is my own implementation of a [Sierpinski triangle](https://en.wikipedia.org/wiki/Sierpinski_triangle) explorer using `typescript`, `karma`, `jasmine`, `tslint` and `webpack`.
