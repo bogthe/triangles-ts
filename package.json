@@ -4,11 +4,12 @@
   "description": "Sierpinski Triangle",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"npm run webpack\" \"npm run lite\"",
+    "start": "concurrently \"npm run webpack:w\" \"npm run lite\"",
     "lite": "lite-server",
-    "webpack": "webpack --watch",
+    "webpack:w": "webpack --watch",
+    "webpack": "webpack",
     "lint": "tslint ./src/**/**.ts",
-    "test": "karma start karma.conf.js"
+    "test": "karma start karma.conf.js --single-run"
   },
   "keywords": [],
   "author": "Bogdan Stolojan",
@@ -17,8 +18,8 @@
     "concurrently": "^3.5.0",
     "jasmine-core": "^2.7.0",
     "karma": "^1.7.0",
-    "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.4",
     "karma-typescript": "^3.0.4",
     "lite-server": "^2.3.0",
     "ts-loader": "^2.3.2",
