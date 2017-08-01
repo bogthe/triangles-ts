@@ -1,4 +1,7 @@
 # Triangles - Typescript
+
+*Build status:*
+
 ## What?!
 This is my own implementation of a [Sierpinski triangle](https://en.wikipedia.org/wiki/Sierpinski_triangle) explorer using `typescript`, `karma`, `jasmine`, `tslint` and `webpack`.
 
