@@ -1,4 +1,4 @@
-import { Point } from './point';
+import { Point } from './index';
 
 describe('Point', () => {
     let testPoint: Point;

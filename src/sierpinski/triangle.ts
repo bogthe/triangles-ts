@@ -1,5 +1,4 @@
-import { Vertices } from './vertices';
-import { Point } from './point';
+import { Vertices, Point } from './index';
 
 export class Triangle {
     constructor(private vertices: Vertices) {

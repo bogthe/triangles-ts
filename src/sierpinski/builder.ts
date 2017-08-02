@@ -1,6 +1,4 @@
-import { Triangle } from './triangle';
-import { Vertices } from './vertices';
-import { Point } from './point';
+import { Triangle, Vertices, Point } from './index';
 
 export module TriangleBuilder {
     const trianglePool: Array<Triangle> = new Array<Triangle>();

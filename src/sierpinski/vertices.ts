@@ -1,4 +1,4 @@
-import { Point } from './point';
+import { Point } from './index';
 
 export interface Vertices {
     p1: Point;

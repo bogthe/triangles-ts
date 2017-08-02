@@ -1,6 +1,4 @@
-import { Triangle } from './triangle';
-import { Vertices } from './vertices';
-import { Point } from './point';
+import { Triangle, Vertices, Point } from './index';
 
 describe('Triangle', () => {
     let vertices: Vertices;
