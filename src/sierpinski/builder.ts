@@ -25,9 +25,10 @@ export module TriangleBuilder {
     }
 
     export function draw(context: CanvasRenderingContext2D) {
-        if(!context)
+        if (!context) {
             return;
-        
+        }
+
         context.clearRect(0, 0, innerWidth, innerHeight);
         context.beginPath();
 
