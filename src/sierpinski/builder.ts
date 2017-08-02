@@ -2,9 +2,14 @@ import { Triangle, Vertices, Point } from './index';
 
 export module TriangleBuilder {
     const trianglePool: Array<Triangle> = new Array<Triangle>();
+    let context: CanvasRenderingContext2D;
 
     export function reset() {
         trianglePool.length = 0;
+    }
+
+    export function loadContext(ctx: CanvasRenderingContext2D) {
+        context = ctx;
     }
 
     export function createNew(vertices: Vertices): Triangle {
@@ -16,15 +21,19 @@ export module TriangleBuilder {
         trianglePool.forEach(triangle => {
             triangle.scale(ammount, location);
         });
+
+        draw();
     }
 
     export function translate(direction: Point) {
         trianglePool.forEach(triangle => {
             triangle.translate(direction);
         });
+
+        draw();
     }
 
-    export function draw(context: CanvasRenderingContext2D) {
+    export function draw() {
         if (!context) {
             return;
         }

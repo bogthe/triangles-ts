@@ -47,7 +47,7 @@ describe('Triangle Builder', () => {
     });
 
     it('should handle a null context without throwing an error', () => {
-        TriangleBuilder.draw(null);
+        TriangleBuilder.draw();
     });
 
     it('should clear the context before every draw step', () => {
@@ -55,7 +55,8 @@ describe('Triangle Builder', () => {
         const context: CanvasRenderingContext2D = canvas.getContext('2d');
         spyOn(context, 'clearRect').and.callFake(() => { });
 
-        TriangleBuilder.draw(context);
+        TriangleBuilder.loadContext(context);
+        TriangleBuilder.draw();
 
         expect(context.clearRect).toHaveBeenCalled();
     });
@@ -68,7 +69,8 @@ describe('Triangle Builder', () => {
         spyOn(context, 'fill').and.callFake(() => { });
 
         TriangleBuilder.createNew(verts);
-        TriangleBuilder.draw(context);
+        TriangleBuilder.loadContext(context);
+        TriangleBuilder.draw();
 
         expect(context.moveTo).toHaveBeenCalled();
         expect(context.lineTo).toHaveBeenCalled();
