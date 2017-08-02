@@ -1,7 +1,7 @@
 export class Scene {
-    constructor(){
+    constructor() {
         console.log('Is this on?');
     }
 }
 
-const scene:Scene = new Scene();
+const scene: Scene = new Scene();
