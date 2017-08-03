@@ -22,32 +22,20 @@ export class Scene {
             context
         );
 
-        const secondMesh: Mesh = new Mesh(
-            {
-                p1: new Point(200, 0),
-                p2: new Point(400, 400),
-                p3: new Point(0, 400)
-            },
-            context
-        );
-
         this.resizeCanvas(canvas);
 
         const centerScreen: Point = new Point(innerWidth / 2, innerHeight / 2);
         const keyboard: KeyboardControls = new KeyboardControls();
         keyboard.onTranslate((direction) => {
             mesh.translate(direction.multiplyBy(5));
-            secondMesh.translate(direction.multiplyBy(5));
         });
 
         keyboard.onZoomIn(() => {
             mesh.scale(1 - (5 / 100), centerScreen);
-            secondMesh.scale(1 - (5 / 100), centerScreen);
         });
 
         keyboard.onZoomOut(() => {
             mesh.scale(1 + (5 / 100), centerScreen);
-            secondMesh.scale(1 + (5 / 100), centerScreen);
         });
 
     }
