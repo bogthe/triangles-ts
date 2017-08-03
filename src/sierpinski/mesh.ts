@@ -1,12 +1,16 @@
-import { Point, Vertices, TriangleBuilder } from './index';
+import { Point, Vertices, Context, Drawable } from './index';
 
-export class Mesh {
+export class Mesh implements Drawable {
     mesh: Array<Vertices> = new Array<Vertices>();
 
-    constructor(spawnPoint: Vertices, private context: CanvasRenderingContext2D) {
+    constructor(spawnPoint: Vertices) {
         this.mesh.push(spawnPoint);
 
-        while (this.width > TriangleBuilder.maxWidth) {
+        if (!spawnPoint.p1 || !spawnPoint.p2 || !spawnPoint.p3) {
+            throw Error('Invalid vertices coordinates');
+        }
+
+        while (this.width > Context.maxWidth) {
             this.checkFractal();
         }
     }
@@ -27,57 +31,33 @@ export class Mesh {
         });
 
         this.checkFractal();
-        this.draw();
     }
 
     public translate(direction: Point) {
+        if (isNaN(direction.x) || isNaN(direction.y)) {
+            return;
+        }
+
         this.mesh.forEach(vert => {
             vert.p1 = vert.p1.add(direction);
             vert.p2 = vert.p2.add(direction);
             vert.p3 = vert.p3.add(direction);
         });
-        this.draw();
     }
 
-    public draw() {
-        this.context.clearRect(0, 0, innerWidth, innerHeight);
-        this.context.beginPath();
-
+    public draw(context: CanvasRenderingContext2D) {
         this.mesh.forEach(vert => {
             if (this.isCulled(vert)) {
                 return;
             }
 
-            this.context.moveTo(vert.p1.x, vert.p1.y);
-            this.context.lineTo(vert.p2.x, vert.p2.y);
-            this.context.lineTo(vert.p3.x, vert.p3.y);
+            context.moveTo(vert.p1.x, vert.p1.y);
+            context.lineTo(vert.p2.x, vert.p2.y);
+            context.lineTo(vert.p3.x, vert.p3.y);
         });
-
-        this.context.fill();
-        this.context.closePath();
     }
 
-    private isCulled(vert: Vertices): boolean {
-        return (vert.p3.x > TriangleBuilder.getBounds().width
-            || vert.p1.y > TriangleBuilder.getBounds().height
-            || vert.p2.x < 0
-            || vert.p2.y < 0
-        );
-    }
-
-    private get width(): number {
-        return this.mesh[0].p1.distanceOnX(this.mesh[0].p3);
-    }
-
-    private checkFractal() {
-        if (this.width > TriangleBuilder.maxWidth) {
-            this.mesh = this.split(this.mesh);
-        } else if (this.width < TriangleBuilder.minWidth) {
-            this.mesh = this.merge(this.mesh);
-        }
-    }
-
-    private split(oldMesh: Array<Vertices>): Array<Vertices> {
+    public split(oldMesh: Array<Vertices>): Array<Vertices> {
         const newMesh: Array<Vertices> = new Array<Vertices>();
         oldMesh.forEach(vert => {
             newMesh.push({
@@ -101,7 +81,10 @@ export class Mesh {
         return newMesh;
     }
 
-    private merge(oldMesh: Array<Vertices>) {
+    public merge(oldMesh: Array<Vertices>): Array<Vertices> {
+        if (oldMesh.length < 3) {
+            return oldMesh;
+        }
         const newMesh: Array<Vertices> = new Array<Vertices>();
         oldMesh.forEach((vert, index) => {
             if (index % 3 !== 0) {
@@ -114,5 +97,25 @@ export class Mesh {
             });
         });
         return newMesh;
+    }
+
+    private isCulled(vert: Vertices): boolean {
+        return (vert.p3.x > Context.getBounds().width
+            || vert.p1.y > Context.getBounds().height
+            || vert.p2.x < 0
+            || vert.p2.y < 0
+        );
+    }
+
+    private get width(): number {
+        return this.mesh[0].p1.distanceOnX(this.mesh[0].p3);
+    }
+
+    private checkFractal() {
+        if (this.width > Context.maxWidth) {
+            this.mesh = this.split(this.mesh);
+        } else if (this.width < Context.minWidth) {
+            this.mesh = this.merge(this.mesh);
+        }
     }
 }

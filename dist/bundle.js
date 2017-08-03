@@ -73,9 +73,9 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
+__export(__webpack_require__(3));
 __export(__webpack_require__(4));
 __export(__webpack_require__(5));
-__export(__webpack_require__(6));
 
 
 /***/ }),
@@ -124,68 +124,278 @@ exports.Controls = Controls;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var keyboard_1 = __webpack_require__(3);
-var mouse_1 = __webpack_require__(7);
 var sierpinski_1 = __webpack_require__(0);
-var Scene = (function () {
-    function Scene() {
-        this.meshSetup();
-    }
-    Scene.prototype.meshSetup = function () {
-        var canvas = document.querySelector('canvas');
-        if (!canvas) {
-            return;
-        }
-        var context = canvas.getContext('2d');
-        var mesh = new sierpinski_1.Mesh({
-            p1: new sierpinski_1.Point(window.innerWidth / 2, 0),
-            p2: new sierpinski_1.Point(window.innerWidth, window.innerHeight),
-            p3: new sierpinski_1.Point(0, window.innerHeight)
-        }, context);
-        this.resizeCanvas(canvas);
-        var centerScreen = new sierpinski_1.Point(innerWidth / 2, innerHeight / 2);
-        var keyboard = new keyboard_1.KeyboardControls();
-        var mouse = new mouse_1.MouseControls();
-        keyboard.onTranslate(function (direction) {
-            mesh.translate(direction.multiplyBy(5));
-        });
-        mouse.onTranslate(function (direction) {
-            mesh.translate(direction.multiplyBy(5));
-        });
-        mouse.onZoomIn(function (location) {
-            mesh.scale(1 - (5 / 100), location);
-        });
-        mouse.onZoomOut(function (location) {
-            mesh.scale(1 + (5 / 100), location);
-        });
-        keyboard.onZoomIn(function () {
-            mesh.scale(1 - (5 / 100), centerScreen);
-        });
-        keyboard.onZoomOut(function () {
-            mesh.scale(1 + (5 / 100), centerScreen);
-        });
-    };
-    Scene.prototype.resizeCanvas = function (canvas) {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        sierpinski_1.TriangleBuilder.setBounds({
-            width: canvas.width,
-            height: canvas.height
-        });
-    };
-    return Scene;
-}());
-exports.Scene = Scene;
+var keyboard_1 = __webpack_require__(6);
+var mouse_1 = __webpack_require__(7);
 window.onload = function () {
-    var scene = new Scene();
-    window.onresize = function () {
-        scene.resizeCanvas(document.querySelector('canvas'));
-    };
+    sierpinski_1.Context.loadControls([
+        new keyboard_1.KeyboardControls(),
+        new mouse_1.MouseControls()
+    ]);
+    sierpinski_1.Context.addObjectToScene(new sierpinski_1.Mesh({
+        p1: new sierpinski_1.Point(window.innerWidth / 2, 0),
+        p2: new sierpinski_1.Point(window.innerWidth, window.innerHeight),
+        p3: new sierpinski_1.Point(0, window.innerHeight)
+    }));
+    sierpinski_1.Context.addObjectToScene(new sierpinski_1.Mesh({
+        p1: new sierpinski_1.Point(50, 0),
+        p2: new sierpinski_1.Point(100, 100),
+        p3: new sierpinski_1.Point(0, 100)
+    }));
+    sierpinski_1.Context.loadCanvas(document.querySelector('canvas'));
 };
 
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Point = (function () {
+    function Point(_x, _y) {
+        this._x = _x;
+        this._y = _y;
+    }
+    Object.defineProperty(Point.prototype, "x", {
+        get: function () {
+            return this._x;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Point.prototype, "y", {
+        get: function () {
+            return this._y;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Point.prototype.substract = function (point) {
+        return new Point(this._x - point.x, this._y - point.y);
+    };
+    Point.prototype.add = function (point) {
+        return new Point(this._x + point.x, this._y + point.y);
+    };
+    Point.prototype.multiplyBy = function (ammount) {
+        return new Point(this._x * ammount, this._y * ammount);
+    };
+    Point.prototype.divideBy = function (ammount) {
+        return new Point(this._x / ammount, this._y / ammount);
+    };
+    Point.prototype.distanceOnX = function (point) {
+        return Math.abs(this._x - point.x);
+    };
+    Point.prototype.midPointTo = function (point) {
+        return this.add(point).divideBy(2);
+    };
+    return Point;
+}());
+exports.Point = Point;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var index_1 = __webpack_require__(0);
+var Mesh = (function () {
+    function Mesh(spawnPoint) {
+        this.mesh = new Array();
+        this.mesh.push(spawnPoint);
+        if (!spawnPoint.p1 || !spawnPoint.p2 || !spawnPoint.p3) {
+            throw Error('Invalid vertices coordinates');
+        }
+        while (this.width > index_1.Context.maxWidth) {
+            this.checkFractal();
+        }
+    }
+    Mesh.prototype.scale = function (ammount, location) {
+        this.mesh.forEach(function (vert) {
+            vert.p1 = vert.p1.substract(location)
+                .multiplyBy(ammount)
+                .add(location);
+            vert.p2 = vert.p2.substract(location)
+                .multiplyBy(ammount)
+                .add(location);
+            vert.p3 = vert.p3.substract(location)
+                .multiplyBy(ammount)
+                .add(location);
+        });
+        this.checkFractal();
+    };
+    Mesh.prototype.translate = function (direction) {
+        if (isNaN(direction.x) || isNaN(direction.y)) {
+            return;
+        }
+        this.mesh.forEach(function (vert) {
+            vert.p1 = vert.p1.add(direction);
+            vert.p2 = vert.p2.add(direction);
+            vert.p3 = vert.p3.add(direction);
+        });
+    };
+    Mesh.prototype.draw = function (context) {
+        var _this = this;
+        this.mesh.forEach(function (vert) {
+            if (_this.isCulled(vert)) {
+                return;
+            }
+            context.moveTo(vert.p1.x, vert.p1.y);
+            context.lineTo(vert.p2.x, vert.p2.y);
+            context.lineTo(vert.p3.x, vert.p3.y);
+        });
+    };
+    Mesh.prototype.split = function (oldMesh) {
+        var newMesh = new Array();
+        oldMesh.forEach(function (vert) {
+            newMesh.push({
+                p1: vert.p1,
+                p2: vert.p1.midPointTo(vert.p2),
+                p3: vert.p1.midPointTo(vert.p3)
+            });
+            newMesh.push({
+                p1: vert.p2.midPointTo(vert.p1),
+                p2: vert.p2,
+                p3: vert.p2.midPointTo(vert.p3)
+            });
+            newMesh.push({
+                p1: vert.p3.midPointTo(vert.p1),
+                p2: vert.p3.midPointTo(vert.p2),
+                p3: vert.p3
+            });
+        });
+        return newMesh;
+    };
+    Mesh.prototype.merge = function (oldMesh) {
+        if (oldMesh.length < 3) {
+            return oldMesh;
+        }
+        var newMesh = new Array();
+        oldMesh.forEach(function (vert, index) {
+            if (index % 3 !== 0) {
+                return;
+            }
+            newMesh.push({
+                p1: oldMesh[index].p1,
+                p2: oldMesh[index + 1].p2,
+                p3: oldMesh[index + 2].p3
+            });
+        });
+        return newMesh;
+    };
+    Mesh.prototype.isCulled = function (vert) {
+        return (vert.p3.x > index_1.Context.getBounds().width
+            || vert.p1.y > index_1.Context.getBounds().height
+            || vert.p2.x < 0
+            || vert.p2.y < 0);
+    };
+    Object.defineProperty(Mesh.prototype, "width", {
+        get: function () {
+            return this.mesh[0].p1.distanceOnX(this.mesh[0].p3);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Mesh.prototype.checkFractal = function () {
+        if (this.width > index_1.Context.maxWidth) {
+            this.mesh = this.split(this.mesh);
+        }
+        else if (this.width < index_1.Context.minWidth) {
+            this.mesh = this.merge(this.mesh);
+        }
+    };
+    return Mesh;
+}());
+exports.Mesh = Mesh;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Context;
+(function (Context) {
+    Context.minWidth = 10;
+    Context.maxWidth = 30;
+    var speed = 5;
+    var sceneObjects = new Array();
+    var canvas;
+    var context;
+    var bounds;
+    function loadControls(controls) {
+        controls.forEach(function (control) {
+            control.onTranslate(translate);
+            control.onZoomIn(zoomIn);
+            control.onZoomOut(zoomOut);
+        });
+    }
+    Context.loadControls = loadControls;
+    function loadCanvas(htmlCanvas) {
+        if (!htmlCanvas) {
+            htmlCanvas = document.createElement('canvas');
+        }
+        canvas = htmlCanvas;
+        context = canvas.getContext('2d');
+        onResize();
+    }
+    Context.loadCanvas = loadCanvas;
+    function addObjectToScene(obj) {
+        sceneObjects.push(obj);
+    }
+    Context.addObjectToScene = addObjectToScene;
+    function onResize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        bounds = { width: canvas.width, height: canvas.height };
+        draw();
+    }
+    Context.onResize = onResize;
+    function getBounds() {
+        return bounds;
+    }
+    Context.getBounds = getBounds;
+    function translate(direction) {
+        sceneObjects.forEach(function (obj) {
+            obj.translate(direction.multiplyBy(speed));
+        });
+        draw();
+    }
+    Context.translate = translate;
+    function zoomIn(location) {
+        sceneObjects.forEach(function (obj) {
+            obj.scale(1 + (speed / 100), location);
+        });
+        draw();
+    }
+    Context.zoomIn = zoomIn;
+    function zoomOut(location) {
+        sceneObjects.forEach(function (obj) {
+            obj.scale(1 - (speed / 100), location);
+        });
+        draw();
+    }
+    Context.zoomOut = zoomOut;
+    function draw() {
+        context.clearRect(0, 0, bounds.width, bounds.height);
+        context.beginPath();
+        sceneObjects.forEach(function (obj) {
+            obj.draw(context);
+        });
+        context.closePath();
+        context.fill();
+    }
+})(Context = exports.Context || (exports.Context = {}));
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -242,194 +452,6 @@ exports.KeyboardControls = KeyboardControls;
 
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var TriangleBuilder;
-(function (TriangleBuilder) {
-    TriangleBuilder.maxWidth = 30;
-    TriangleBuilder.minWidth = 10;
-    var bounds;
-    function setBounds(canvasBounds) {
-        bounds = canvasBounds;
-    }
-    TriangleBuilder.setBounds = setBounds;
-    function getBounds() {
-        return bounds;
-    }
-    TriangleBuilder.getBounds = getBounds;
-})(TriangleBuilder = exports.TriangleBuilder || (exports.TriangleBuilder = {}));
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Point = (function () {
-    function Point(_x, _y) {
-        this._x = _x;
-        this._y = _y;
-    }
-    Object.defineProperty(Point.prototype, "x", {
-        get: function () {
-            return this._x;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Point.prototype, "y", {
-        get: function () {
-            return this._y;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Point.prototype.substract = function (point) {
-        return new Point(this._x - point.x, this._y - point.y);
-    };
-    Point.prototype.add = function (point) {
-        return new Point(this._x + point.x, this._y + point.y);
-    };
-    Point.prototype.multiplyBy = function (ammount) {
-        return new Point(this._x * ammount, this._y * ammount);
-    };
-    Point.prototype.divideBy = function (ammount) {
-        return new Point(this._x / ammount, this._y / ammount);
-    };
-    Point.prototype.distanceOnX = function (point) {
-        return Math.abs(this._x - point.x);
-    };
-    Point.prototype.midPointTo = function (point) {
-        return this.add(point).divideBy(2);
-    };
-    return Point;
-}());
-exports.Point = Point;
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var index_1 = __webpack_require__(0);
-var Mesh = (function () {
-    function Mesh(spawnPoint, context) {
-        this.context = context;
-        this.mesh = new Array();
-        this.mesh.push(spawnPoint);
-        while (this.width > index_1.TriangleBuilder.maxWidth) {
-            this.checkFractal();
-        }
-    }
-    Mesh.prototype.scale = function (ammount, location) {
-        this.mesh.forEach(function (vert) {
-            vert.p1 = vert.p1.substract(location)
-                .multiplyBy(ammount)
-                .add(location);
-            vert.p2 = vert.p2.substract(location)
-                .multiplyBy(ammount)
-                .add(location);
-            vert.p3 = vert.p3.substract(location)
-                .multiplyBy(ammount)
-                .add(location);
-        });
-        this.checkFractal();
-        this.draw();
-    };
-    Mesh.prototype.translate = function (direction) {
-        this.mesh.forEach(function (vert) {
-            vert.p1 = vert.p1.add(direction);
-            vert.p2 = vert.p2.add(direction);
-            vert.p3 = vert.p3.add(direction);
-        });
-        this.draw();
-    };
-    Mesh.prototype.draw = function () {
-        var _this = this;
-        this.context.clearRect(0, 0, innerWidth, innerHeight);
-        this.context.beginPath();
-        this.mesh.forEach(function (vert) {
-            if (_this.isCulled(vert)) {
-                return;
-            }
-            _this.context.moveTo(vert.p1.x, vert.p1.y);
-            _this.context.lineTo(vert.p2.x, vert.p2.y);
-            _this.context.lineTo(vert.p3.x, vert.p3.y);
-        });
-        this.context.fill();
-        this.context.closePath();
-    };
-    Mesh.prototype.isCulled = function (vert) {
-        return (vert.p3.x > index_1.TriangleBuilder.getBounds().width
-            || vert.p1.y > index_1.TriangleBuilder.getBounds().height
-            || vert.p2.x < 0
-            || vert.p2.y < 0);
-    };
-    Object.defineProperty(Mesh.prototype, "width", {
-        get: function () {
-            return this.mesh[0].p1.distanceOnX(this.mesh[0].p3);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Mesh.prototype.checkFractal = function () {
-        if (this.width > index_1.TriangleBuilder.maxWidth) {
-            this.mesh = this.split(this.mesh);
-        }
-        else if (this.width < index_1.TriangleBuilder.minWidth) {
-            this.mesh = this.merge(this.mesh);
-        }
-    };
-    Mesh.prototype.split = function (oldMesh) {
-        var newMesh = new Array();
-        oldMesh.forEach(function (vert) {
-            newMesh.push({
-                p1: vert.p1,
-                p2: vert.p1.midPointTo(vert.p2),
-                p3: vert.p1.midPointTo(vert.p3)
-            });
-            newMesh.push({
-                p1: vert.p2.midPointTo(vert.p1),
-                p2: vert.p2,
-                p3: vert.p2.midPointTo(vert.p3)
-            });
-            newMesh.push({
-                p1: vert.p3.midPointTo(vert.p1),
-                p2: vert.p3.midPointTo(vert.p2),
-                p3: vert.p3
-            });
-        });
-        return newMesh;
-    };
-    Mesh.prototype.merge = function (oldMesh) {
-        var newMesh = new Array();
-        oldMesh.forEach(function (vert, index) {
-            if (index % 3 !== 0) {
-                return;
-            }
-            newMesh.push({
-                p1: oldMesh[index].p1,
-                p2: oldMesh[index + 1].p2,
-                p3: oldMesh[index + 2].p3
-            });
-        });
-        return newMesh;
-    };
-    return Mesh;
-}());
-exports.Mesh = Mesh;
-
-
-/***/ }),
 /* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -452,9 +474,6 @@ var MouseControls = (function (_super) {
     __extends(MouseControls, _super);
     function MouseControls() {
         var _this = _super.call(this) || this;
-        _this.initial = new sierpinski_1.Point(0, 0);
-        _this.panOffset = new sierpinski_1.Point(0, 0);
-        _this.mouseUp = false;
         _this.wheel = function (event) {
             if (event.deltaY < 0) {
                 _this.zoomOut(new sierpinski_1.Point(event.clientX, event.clientY));
@@ -464,12 +483,10 @@ var MouseControls = (function (_super) {
             }
         };
         _this.startPan = function (event) {
-            _this.initial = new sierpinski_1.Point(event.clientX, event.clientY);
             document.addEventListener('mousemove', _this.trackPos);
         };
         _this.endPan = function (event) {
             document.removeEventListener('mousemove', _this.trackPos);
-            _this.initial = new sierpinski_1.Point(0, 0);
         };
         _this.trackPos = function (event) {
             var direction = new sierpinski_1.Point(event.movementX, event.movementY);
@@ -478,6 +495,7 @@ var MouseControls = (function (_super) {
         };
         document.addEventListener('mousedown', _this.startPan);
         document.addEventListener('mouseup', _this.endPan);
+        document.addEventListener('mouseleave', _this.endPan);
         document.addEventListener('wheel', _this.wheel);
         return _this;
     }

@@ -2,14 +2,11 @@ import { Controls } from './controls';
 import { Point } from '../sierpinski';
 
 export class MouseControls extends Controls {
-    initial: Point = new Point(0, 0);
-    panOffset: Point = new Point(0, 0);
-    mouseUp = false;
-
     constructor() {
         super();
         document.addEventListener('mousedown', this.startPan);
         document.addEventListener('mouseup', this.endPan);
+        document.addEventListener('mouseleave', this.endPan);
         document.addEventListener('wheel', this.wheel);
     }
 
@@ -22,13 +19,11 @@ export class MouseControls extends Controls {
     }
 
     startPan = (event: MouseEvent) => {
-        this.initial = new Point(event.clientX, event.clientY);
         document.addEventListener('mousemove', this.trackPos);
     }
 
     endPan = (event: MouseEvent) => {
         document.removeEventListener('mousemove', this.trackPos);
-        this.initial = new Point(0, 0);
     }
 
     trackPos = (event: MouseEvent) => {
