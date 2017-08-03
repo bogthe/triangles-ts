@@ -1,15 +1,15 @@
 import { Point } from '../sierpinski';
 
 export abstract class Controls {
-    private inCallback: () => void;
-    private outCallback: () => void;
+    private inCallback: (location: Point) => void;
+    private outCallback: (location: Point) => void;
     private translateCallback: (direction: Point) => void;
 
-    onZoomIn(fn: () => void) {
+    onZoomIn(fn: (location: Point) => void) {
         this.inCallback = fn;
     }
 
-    onZoomOut(fn: () => void) {
+    onZoomOut(fn: (location: Point) => void) {
         this.outCallback = fn;
     }
 
@@ -17,15 +17,15 @@ export abstract class Controls {
         this.translateCallback = fn;
     }
 
-    zoomIn() {
+    zoomIn(location: Point) {
         if (this.inCallback) {
-            this.inCallback();
+            this.inCallback(location);
         }
     }
 
-    zoomOut() {
+    zoomOut(location: Point) {
         if (this.outCallback) {
-            this.outCallback();
+            this.outCallback(location);
         }
     }
 

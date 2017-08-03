@@ -27,10 +27,10 @@ export class KeyboardControls extends Controls {
                 this.translate(this.down);
                 break;
             case 'KeyE':
-                this.zoomIn();
+                this.zoomIn(new Point(0, 0));
                 break;
             case 'KeyQ':
-                this.zoomOut();
+                this.zoomOut(new Point(0, 0));
                 break;
         }
     }

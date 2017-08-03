@@ -1,4 +1,5 @@
 import { KeyboardControls } from './controls/keyboard';
+import { MouseControls } from './controls/mouse';
 import { TriangleBuilder, Point, Mesh } from './sierpinski';
 
 export class Scene {
@@ -26,9 +27,23 @@ export class Scene {
 
         const centerScreen: Point = new Point(innerWidth / 2, innerHeight / 2);
         const keyboard: KeyboardControls = new KeyboardControls();
+        const mouse: MouseControls = new MouseControls();
+
         keyboard.onTranslate((direction) => {
             mesh.translate(direction.multiplyBy(5));
         });
+
+        mouse.onTranslate((direction) => {
+            mesh.translate(direction.multiplyBy(5));
+        });
+
+        mouse.onZoomIn(location => {
+            mesh.scale(1 - (5 / 100), location);
+        });
+
+        mouse.onZoomOut(location => {
+            mesh.scale(1 + (5 / 100), location);
+        })
 
         keyboard.onZoomIn(() => {
             mesh.scale(1 - (5 / 100), centerScreen);
@@ -37,7 +52,6 @@ export class Scene {
         keyboard.onZoomOut(() => {
             mesh.scale(1 + (5 / 100), centerScreen);
         });
-
     }
 
     public resizeCanvas(canvas: HTMLCanvasElement) {
