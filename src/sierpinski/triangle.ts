@@ -3,8 +3,10 @@ import { Vertices, Point, TriangleBuilder } from './index';
 export class Triangle {
     hasSplit: boolean = false;
 
-
     constructor(private vertices: Vertices) {
+        if (this.width > TriangleBuilder.maxWidth) {
+            this.checkSplit();
+        }
     }
 
     get getVerts(): Vertices {
@@ -12,7 +14,7 @@ export class Triangle {
     }
 
     get isVisible(): boolean {
-        return !(this.hasSplit
+        return !(this.width > TriangleBuilder.maxWidth || this.width < TriangleBuilder.minWidth
             || this.vertices.p3.x > TriangleBuilder.getBounds().width
             || this.vertices.p1.y > TriangleBuilder.getBounds().height
             || this.vertices.p2.x < 0
@@ -52,8 +54,6 @@ export class Triangle {
         }
 
         if (this.width > TriangleBuilder.maxWidth) {
-            this.hasSplit = true;
-
             TriangleBuilder.createNew({
                 p1: this.vertices.p1,
                 p2: this.vertices.p1.midPointTo(this.vertices.p2),
@@ -71,6 +71,8 @@ export class Triangle {
                 p2: this.vertices.p3.midPointTo(this.vertices.p2),
                 p3: this.vertices.p3,
             });
+
+            this.hasSplit = true;
         }
     }
 }
