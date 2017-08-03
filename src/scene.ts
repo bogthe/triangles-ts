@@ -46,6 +46,11 @@ export class Scene {
     public resizeCanvas(canvas: HTMLCanvasElement) {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        
+        TriangleBuilder.setBounds({
+            width: canvas.width,
+            height: canvas.height
+        });
         TriangleBuilder.draw();
     }
 }
