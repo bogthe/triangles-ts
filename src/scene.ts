@@ -1,57 +1,65 @@
 import { KeyboardControls } from './controls/keyboard';
-import { TriangleBuilder, Point } from './sierpinski';
+import { TriangleBuilder, Point, Mesh } from './sierpinski';
 
 export class Scene {
     constructor() {
-        this.initializeControls();
-        this.setupScene();
+        this.meshSetup();
     }
 
-    private initializeControls() {
-        const zoomFactor = 5;
-        const translateSpeed = 5;
-        const keyboard: KeyboardControls = new KeyboardControls();
-        const centerScreen: Point = new Point(innerWidth / 2, innerHeight / 2);
-
-        keyboard.onTranslate((direction) => {
-            TriangleBuilder.translate(direction.multiplyBy(translateSpeed));
-        });
-
-        keyboard.onZoomIn(() => {
-            TriangleBuilder.scale(1 - (zoomFactor / 100), centerScreen);
-        });
-
-        keyboard.onZoomOut(() => {
-            TriangleBuilder.scale(1 + (zoomFactor / 100), centerScreen);
-        });
-    }
-
-    private setupScene() {
+    private meshSetup() {
         const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('canvas');
         if (!canvas) {
             return;
         }
 
         const context: CanvasRenderingContext2D = canvas.getContext('2d');
-        TriangleBuilder.loadContext(context);
-        TriangleBuilder.createNew({
-            p1: new Point(window.innerWidth / 2, 0),
-            p2: new Point(window.innerWidth, window.innerHeight),
-            p3: new Point(0, window.innerHeight)
-        });
+        const mesh: Mesh = new Mesh(
+            {
+                p1: new Point(window.innerWidth / 2, 0),
+                p2: new Point(window.innerWidth, window.innerHeight),
+                p3: new Point(0, window.innerHeight)
+            },
+            context
+        );
+
+        const secondMesh: Mesh = new Mesh(
+            {
+                p1: new Point(200, 0),
+                p2: new Point(400, 400),
+                p3: new Point(0, 400)
+            },
+            context
+        );
 
         this.resizeCanvas(canvas);
+
+        const centerScreen: Point = new Point(innerWidth / 2, innerHeight / 2);
+        const keyboard: KeyboardControls = new KeyboardControls();
+        keyboard.onTranslate((direction) => {
+            mesh.translate(direction.multiplyBy(5));
+            secondMesh.translate(direction.multiplyBy(5));
+        });
+
+        keyboard.onZoomIn(() => {
+            mesh.scale(1 - (5 / 100), centerScreen);
+            secondMesh.scale(1 - (5 / 100), centerScreen);
+        });
+
+        keyboard.onZoomOut(() => {
+            mesh.scale(1 + (5 / 100), centerScreen);
+            secondMesh.scale(1 + (5 / 100), centerScreen);
+        });
+
     }
 
     public resizeCanvas(canvas: HTMLCanvasElement) {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        
+
         TriangleBuilder.setBounds({
             width: canvas.width,
             height: canvas.height
         });
-        TriangleBuilder.draw();
     }
 }
 
