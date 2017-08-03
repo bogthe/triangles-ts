@@ -1,11 +1,23 @@
 import { Triangle, Vertices, Point } from './index';
 
 export module TriangleBuilder {
+    export const maxWidth = 100;
+    export const minWidth = 30;
+
     const trianglePool: Array<Triangle> = new Array<Triangle>();
     let context: CanvasRenderingContext2D;
+    let bounds: Bounds;
 
     export function reset() {
         trianglePool.length = 0;
+    }
+
+    export function setBounds(canvasBounds: Bounds) {
+        bounds = canvasBounds;
+    }
+
+    export function getBounds(): Bounds {
+        return bounds;
     }
 
     export function loadContext(ctx: CanvasRenderingContext2D) {
@@ -42,6 +54,8 @@ export module TriangleBuilder {
         context.beginPath();
 
         trianglePool.forEach(triangle => {
+            if(!triangle.isVisible)
+                return;
             context.moveTo(triangle.getVerts.p1.x, triangle.getVerts.p1.y);
             context.lineTo(triangle.getVerts.p2.x, triangle.getVerts.p2.y);
             context.lineTo(triangle.getVerts.p3.x, triangle.getVerts.p3.y);
@@ -49,5 +63,10 @@ export module TriangleBuilder {
         });
 
         context.closePath();
+    }
+
+    export interface Bounds {
+        width: number;
+        height: number;
     }
 }

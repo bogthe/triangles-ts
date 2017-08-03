@@ -21,4 +21,16 @@ export class Point {
     public multiplyBy(ammount: number): Point {
         return new Point(this._x * ammount, this._y * ammount);
     }
+
+    public divideBy(ammount: number): Point {
+        return new Point(this._x / ammount, this._y / ammount);
+    }
+
+    public distanceOnX(point: Point): number {
+        return Math.abs(this._x - point.x);
+    }
+
+    public midPointTo(point: Point): Point {
+        return this.add(point).divideBy(2);
+    }
 }
