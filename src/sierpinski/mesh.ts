@@ -40,7 +40,6 @@ export class Mesh {
     }
 
     public draw() {
-        console.time("draw");
         this.context.clearRect(0, 0, innerWidth, innerHeight);
         this.context.beginPath();
 
@@ -53,11 +52,9 @@ export class Mesh {
             this.context.lineTo(vert.p2.x, vert.p2.y);
             this.context.lineTo(vert.p3.x, vert.p3.y);
         });
-        
+
         this.context.fill();
         this.context.closePath();
-        console.timeEnd("draw");
-        console.log(this.mesh.length);
     }
 
     private isCulled(vert: Vertices): boolean {

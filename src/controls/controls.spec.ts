@@ -14,13 +14,13 @@ describe('Controls', () => {
         spyOn(mockObj, 'callback').and.callFake(() => { });
         controls.onZoomIn(mockObj.callback);
 
-        controls.zoomIn();
+        controls.zoomIn(new Point(0, 0));
 
         expect(mockObj.callback).toHaveBeenCalled();
     });
 
     it('should handle no onZoomIn callback when calling zoomIn', () => {
-        controls.zoomIn();
+        controls.zoomIn(new Point(0, 0));
     });
 
     it('should trigger onZoomOut callback when calling zoomOut', () => {
@@ -28,13 +28,13 @@ describe('Controls', () => {
         spyOn(mockObj, 'callback').and.callFake(() => { });
         controls.onZoomOut(mockObj.callback);
 
-        controls.zoomOut();
+        controls.zoomOut(new Point(0, 0));
 
         expect(mockObj.callback).toHaveBeenCalled();
     });
 
     it('should handle no onZoomOut callback when calling zoomOut', () => {
-        controls.zoomOut();
+        controls.zoomOut(new Point(0, 0));
     });
 
     it('should trigger onTranslate callback when calling translate', () => {

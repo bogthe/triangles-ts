@@ -4,7 +4,7 @@ import { Point } from '../sierpinski';
 export class MouseControls extends Controls {
     initial: Point = new Point(0, 0);
     panOffset: Point = new Point(0, 0);
-    mouseUp: boolean = false;
+    mouseUp = false;
 
     constructor() {
         super();
@@ -34,11 +34,6 @@ export class MouseControls extends Controls {
     trackPos = (event: MouseEvent) => {
         const direction: Point = new Point(event.movementX, event.movementY);
         const magnitude = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
-
-        if (direction.x == 0 && direction.y == 0) {
-            this.translate(new Point(1, 1));
-        } else {
-            this.translate(direction.divideBy(magnitude));
-        }
+        this.translate(direction.divideBy(magnitude));
     }
 }

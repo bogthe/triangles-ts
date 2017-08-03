@@ -76,7 +76,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __export(__webpack_require__(4));
 __export(__webpack_require__(5));
 __export(__webpack_require__(6));
-__export(__webpack_require__(7));
 
 
 /***/ }),
@@ -126,7 +125,7 @@ exports.Controls = Controls;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var keyboard_1 = __webpack_require__(3);
-var mouse_1 = __webpack_require__(8);
+var mouse_1 = __webpack_require__(7);
 var sierpinski_1 = __webpack_require__(0);
 var Scene = (function () {
     function Scene() {
@@ -249,18 +248,11 @@ exports.KeyboardControls = KeyboardControls;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var index_1 = __webpack_require__(0);
 var TriangleBuilder;
 (function (TriangleBuilder) {
     TriangleBuilder.maxWidth = 30;
     TriangleBuilder.minWidth = 10;
-    var trianglePool = new Array();
-    var context;
     var bounds;
-    function reset() {
-        trianglePool.length = 0;
-    }
-    TriangleBuilder.reset = reset;
     function setBounds(canvasBounds) {
         bounds = canvasBounds;
     }
@@ -269,51 +261,6 @@ var TriangleBuilder;
         return bounds;
     }
     TriangleBuilder.getBounds = getBounds;
-    function loadContext(ctx) {
-        context = ctx;
-    }
-    TriangleBuilder.loadContext = loadContext;
-    function createNew(vertices) {
-        trianglePool.push(new index_1.Triangle(vertices));
-        return trianglePool[trianglePool.length - 1];
-    }
-    TriangleBuilder.createNew = createNew;
-    function scale(ammount, location) {
-        console.time("scale");
-        trianglePool.forEach(function (triangle) {
-            triangle.scale(ammount, location);
-        });
-        console.timeEnd("scale");
-        draw();
-    }
-    TriangleBuilder.scale = scale;
-    function translate(direction) {
-        trianglePool.forEach(function (triangle) {
-            triangle.translate(direction);
-        });
-        draw();
-    }
-    TriangleBuilder.translate = translate;
-    function draw() {
-        if (!context) {
-            return;
-        }
-        console.time("draw");
-        context.clearRect(0, 0, innerWidth, innerHeight);
-        context.beginPath();
-        trianglePool.forEach(function (triangle) {
-            if (!triangle.isVisible)
-                return;
-            context.moveTo(triangle.getVerts.p1.x, triangle.getVerts.p1.y);
-            context.lineTo(triangle.getVerts.p2.x, triangle.getVerts.p2.y);
-            context.lineTo(triangle.getVerts.p3.x, triangle.getVerts.p3.y);
-        });
-        context.fill();
-        context.closePath();
-        console.timeEnd("draw");
-        console.log(trianglePool.length);
-    }
-    TriangleBuilder.draw = draw;
 })(TriangleBuilder = exports.TriangleBuilder || (exports.TriangleBuilder = {}));
 
 
@@ -374,92 +321,6 @@ exports.Point = Point;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var index_1 = __webpack_require__(0);
-var Triangle = (function () {
-    function Triangle(vertices) {
-        this.vertices = vertices;
-        this.hasSplit = false;
-        if (this.width > index_1.TriangleBuilder.maxWidth) {
-            this.checkSplit();
-        }
-    }
-    Object.defineProperty(Triangle.prototype, "getVerts", {
-        get: function () {
-            return this.vertices;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Triangle.prototype, "isVisible", {
-        get: function () {
-            return !(this.width > index_1.TriangleBuilder.maxWidth || this.width < index_1.TriangleBuilder.minWidth
-                || this.vertices.p3.x > index_1.TriangleBuilder.getBounds().width
-                || this.vertices.p1.y > index_1.TriangleBuilder.getBounds().height
-                || this.vertices.p2.x < 0
-                || this.vertices.p2.y < 0);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Triangle.prototype.scale = function (ammount, location) {
-        this.vertices.p1 = this.vertices.p1.substract(location)
-            .multiplyBy(ammount)
-            .add(location);
-        this.vertices.p2 = this.vertices.p2.substract(location)
-            .multiplyBy(ammount)
-            .add(location);
-        this.vertices.p3 = this.vertices.p3.substract(location)
-            .multiplyBy(ammount)
-            .add(location);
-        this.checkSplit();
-    };
-    Triangle.prototype.translate = function (direction) {
-        this.vertices.p1 = this.vertices.p1.add(direction);
-        this.vertices.p2 = this.vertices.p2.add(direction);
-        this.vertices.p3 = this.vertices.p3.add(direction);
-    };
-    Object.defineProperty(Triangle.prototype, "width", {
-        get: function () {
-            return this.vertices.p1.distanceOnX(this.vertices.p3);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Triangle.prototype.checkSplit = function () {
-        if (this.hasSplit) {
-            return;
-        }
-        if (this.width > index_1.TriangleBuilder.maxWidth) {
-            index_1.TriangleBuilder.createNew({
-                p1: this.vertices.p1,
-                p2: this.vertices.p1.midPointTo(this.vertices.p2),
-                p3: this.vertices.p1.midPointTo(this.vertices.p3)
-            });
-            index_1.TriangleBuilder.createNew({
-                p1: this.vertices.p2.midPointTo(this.vertices.p1),
-                p2: this.vertices.p2,
-                p3: this.vertices.p2.midPointTo(this.vertices.p3)
-            });
-            index_1.TriangleBuilder.createNew({
-                p1: this.vertices.p3.midPointTo(this.vertices.p1),
-                p2: this.vertices.p3.midPointTo(this.vertices.p2),
-                p3: this.vertices.p3,
-            });
-            this.hasSplit = true;
-        }
-    };
-    return Triangle;
-}());
-exports.Triangle = Triangle;
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var index_1 = __webpack_require__(0);
 var Mesh = (function () {
     function Mesh(spawnPoint, context) {
         this.context = context;
@@ -494,7 +355,6 @@ var Mesh = (function () {
     };
     Mesh.prototype.draw = function () {
         var _this = this;
-        console.time("draw");
         this.context.clearRect(0, 0, innerWidth, innerHeight);
         this.context.beginPath();
         this.mesh.forEach(function (vert) {
@@ -507,8 +367,6 @@ var Mesh = (function () {
         });
         this.context.fill();
         this.context.closePath();
-        console.timeEnd("draw");
-        console.log(this.mesh.length);
     };
     Mesh.prototype.isCulled = function (vert) {
         return (vert.p3.x > index_1.TriangleBuilder.getBounds().width
@@ -572,7 +430,7 @@ exports.Mesh = Mesh;
 
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -616,12 +474,7 @@ var MouseControls = (function (_super) {
         _this.trackPos = function (event) {
             var direction = new sierpinski_1.Point(event.movementX, event.movementY);
             var magnitude = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
-            if (direction.x == 0 && direction.y == 0) {
-                _this.translate(new sierpinski_1.Point(1, 1));
-            }
-            else {
-                _this.translate(direction.divideBy(magnitude));
-            }
+            _this.translate(direction.divideBy(magnitude));
         };
         document.addEventListener('mousedown', _this.startPan);
         document.addEventListener('mouseup', _this.endPan);
