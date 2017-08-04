@@ -3,6 +3,8 @@ import { KeyboardControls } from './controls/keyboard';
 import { MouseControls } from './controls/mouse';
 
 window.onload = () => {
+    alert('Pan: click & drag / arrow keys \t Zoom: scroll / keys: q & e');
+
     Context.loadControls([
         new KeyboardControls(),
         new MouseControls()

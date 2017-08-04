@@ -128,6 +128,7 @@ var sierpinski_1 = __webpack_require__(0);
 var keyboard_1 = __webpack_require__(6);
 var mouse_1 = __webpack_require__(7);
 window.onload = function () {
+    alert('Pan: click & drag / arrow keys \t Zoom: scroll / keys: q & e');
     sierpinski_1.Context.loadControls([
         new keyboard_1.KeyboardControls(),
         new mouse_1.MouseControls()
