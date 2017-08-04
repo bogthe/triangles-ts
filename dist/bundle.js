@@ -205,6 +205,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var index_1 = __webpack_require__(0);
 var Mesh = (function () {
     function Mesh(spawnPoint) {
+        this.maxSize = 59049;
         this.mesh = new Array();
         this.mesh.push(spawnPoint);
         if (!spawnPoint.p1 || !spawnPoint.p2 || !spawnPoint.p3) {
@@ -250,6 +251,9 @@ var Mesh = (function () {
         });
     };
     Mesh.prototype.split = function (oldMesh) {
+        if (oldMesh.length >= this.maxSize) {
+            return oldMesh;
+        }
         var newMesh = new Array();
         oldMesh.forEach(function (vert) {
             newMesh.push({
@@ -320,6 +324,7 @@ exports.Mesh = Mesh;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+var sierpinski_1 = __webpack_require__(0);
 var Context;
 (function (Context) {
     Context.minWidth = 10;
@@ -329,6 +334,8 @@ var Context;
     var canvas;
     var context;
     var bounds;
+    var gradientPos = new sierpinski_1.Point(255, 255);
+    var gradientDirection = 1;
     function loadControls(controls) {
         controls.forEach(function (control) {
             control.onTranslate(translate);
@@ -389,7 +396,19 @@ var Context;
             obj.draw(context);
         });
         context.closePath();
+        mixColors();
+        context.fillStyle = 'rgb(0, ' + Math.floor(255 - gradientPos.x) + ', ' +
+            Math.floor(255 - gradientPos.y) + ')';
         context.fill();
+    }
+    function mixColors() {
+        if (gradientPos.x > 255) {
+            gradientDirection = -gradientDirection;
+        }
+        else if (gradientPos.x < 0) {
+            gradientDirection = -gradientDirection;
+        }
+        gradientPos = gradientPos.add(new sierpinski_1.Point(gradientDirection, gradientDirection));
     }
 })(Context = exports.Context || (exports.Context = {}));
 

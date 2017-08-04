@@ -1,6 +1,7 @@
 import { Point, Vertices, Context, Drawable } from './index';
 
 export class Mesh implements Drawable {
+    readonly maxSize: number = 59049; // 3^10;
     mesh: Array<Vertices> = new Array<Vertices>();
 
     constructor(spawnPoint: Vertices) {
@@ -58,6 +59,10 @@ export class Mesh implements Drawable {
     }
 
     public split(oldMesh: Array<Vertices>): Array<Vertices> {
+        if (oldMesh.length >= this.maxSize) {
+            return oldMesh;
+        }
+
         const newMesh: Array<Vertices> = new Array<Vertices>();
         oldMesh.forEach(vert => {
             newMesh.push({
